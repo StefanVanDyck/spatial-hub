@@ -1,4 +1,5 @@
 <%@ page import="grails.converters.JSON" %>
+<g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
 <!doctype html>
 <html lang="en">
 
@@ -74,9 +75,7 @@
         baseLayers: ${(config.startup.baselayers as grails.converters.JSON).toString().encodeAsRaw()},
         defaultBaseLayer: '${config.startup.baselayer.default}',
 
-        <g:if test="${config.i18n?.region}">
-        i18n: '${config.i18n?.region}',
-        </g:if>
+        i18n: '${lang}',
 
         <g:if test="${config.flickr.url}">
         flickrUrl: '${config.flickr.url}',
