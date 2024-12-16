@@ -74,8 +74,8 @@
         baseLayers: ${(config.startup.baselayers as grails.converters.JSON).toString().encodeAsRaw()},
         defaultBaseLayer: '${config.startup.baselayer.default}',
 
-        <g:if test="${config.i18n?.currentRegion}">
-        i18n: '${config.i18n?.currentRegion}',
+        <g:if test="${config.i18n?.region}">
+        i18n: '${config.i18n?.region}',
         </g:if>
 
         <g:if test="${config.flickr.url}">

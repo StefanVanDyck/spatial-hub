@@ -99,8 +99,6 @@ class PortalController {
                         spApp.put(k, v.class.newInstance(params.get(k, v)))
                     }
 
-                    config.i18n?.currentRegion = org.springframework.context.i18n.LocaleContextHolder.getLocale()?.getISO3Language()
-
                     render(view: 'index',
                             model: [config     : config,
                                     userId     : userId,
