@@ -44,6 +44,7 @@
     "leaflet": "0.7.7",
     "leaflet-draw": "0.2.4",
     "leaflet-measure": "2.1.7",
+    "@mladen/leaflet.tilelayer.wmts": "1.0.0",
     "lz-string": "1.4.4",
     "ng-file-upload": "12.2.13",
     "ngbootbox": "0.1.2",
