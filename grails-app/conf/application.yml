@@ -1,108 +1,558 @@
 ---
-### OIDC Credentials ###
-security:
-  jwt:
-    clientId: spatial_hub
-  oidc:
-    clientId: spatial_hub
-    secret: spatial_hub-oidc-super-secret
-webservice:
-  client-id: spatial_hub
-  client-secret: xxx
-
 grails:
-  serverURL: "${common.protocol}://${common.domain}/spatial-hub"
-  app:
-    context: "/"
-i18n:
-  region: 'nl'
+    serverURL: https://spatial.ala.org.au
+    cors:
+        enabled: true
+    profile: web
+    codegen:
+        defaultPackage: au.org.ala.spatial.portal
+    config:
+        locations:
+            - file:/data/spatial-hub/config/spatial-hub-config.yml
+            - file:/data/spatial-hub/config/spatial-hub-config.groovy
+    spring:
+        transactionManagement:
+            proxies: false
+    gorm:
+        reactor:
+          # Whether to translate GORM events into Reactor events
+          # Disabled by default for performance reasons
+            events: false
+    controllers:
+        upload:
+            maxFileSize: 10000000
+            maxRequestSize: 10000000
+
+layersService:
+    url: 'https://spatial.ala.org.au/ws'
+geoserver:
+  url: 'https://spatial.ala.org.au/geoserver/web/'
+
+info:
+    app:
+        name: '@info.app.name@'
+        version: '@info.app.version@'
+        grailsVersion: '@info.app.grailsVersion@'
+        build:
+          date: '@info.app.build.date@'
+spring:
+    main:
+        banner-mode: "off"
+    groovy:
+        template:
+            check-template-location: false
+    http:
+        multipart:
+            max-file-size: 50MB
+            max-request-size: 50MB
+    server:
+        session:
+            timeout: 7200 # seconds, 2 hours
+        tomcat:
+            port-header: 'X-Forwarded-Port'
+            protocol-header: 'X-Forwarded-Proto'
+            remote-ip-header: 'X-Forwarded-For'
+
+# Spring Actuator Endpoints are Disabled by Default
+endpoints:
+    enabled: false
+    jmx:
+        enabled: true
+
+---
+grails:
+    mime:
+        disable:
+            accept:
+                header:
+                    userAgents:
+                        - Gecko
+                        - WebKit
+                        - Presto
+                        - Trident
+        types:
+            all: '*/*'
+            atom: application/atom+xml
+            css: text/css
+            csv: text/csv
+            form: application/x-www-form-urlencoded
+            html:
+                - text/html
+                - application/xhtml+xml
+            js: text/javascript
+            json:
+                - application/json
+                - text/json
+            multipartForm: multipart/form-data
+            pdf: application/pdf
+            rss: application/rss+xml
+            text: text/plain
+            hal:
+                - application/hal+json
+                - application/hal+xml
+            xml:
+                - text/xml
+                - application/xml
+    urlmapping:
+        cache:
+            maxsize: 1000
+    controllers:
+        defaultScope: singleton
+    converters:
+        encoding: UTF-8
+    views:
+        default:
+            codec: html
+        gsp:
+            encoding: UTF-8
+            htmlcodec: xml
+            codecs:
+                expression: html
+                scriptlets: html
+                taglib: none
+                staticparts: none
+    assets:
+        minifyOptions:
+            excludes:
+                - '**/*.min.js'
+        enableGzip: true
+
+    cache:
+        enabled: true
+
+endpoints:
+    jmx:
+        unique-names: true
+
+userdetails:
+    web:
+      url: 'https://auth.ala.org.au/userdetails/'
+    api:
+      url: 'https://api.ala.org.au/userdetails/'
+
+security:
+  cas:
+    uriFilterPattern: ['/alaAdmin/*', '/']
+    casServerName: 'https://aws-auth.ala.org.au'
+    uriExclusionFilterPattern: ['/portal/q/.*','/portal/messages/.*','/portal/sessionCache/.*','/static/.*','/assets/.*']
+    authenticateOnlyIfCookieFilterPattern: ['/portal/*','/portal/config/*','/portal/i18n/*','/hub/*', '/log/*']
+    loginUrl: ' https://auth.ala.org.au/cas/login'
+    logoutUrl: ' https://auth.ala.org.au/cas/logout'
+    casServerUrlPrefix: 'https://aws-auth-test-2023.test.ala.org.au/cas'
+    bypass: false # set to true for non-ALA deployment
+    ignoreCase: true
+    renew: false
+    authCookieName: ALA-Auth-Test
+    enabled: false
+  oidc:
+    enabled: true
+    discoveryUri: 'https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_Auyv55MYO/.well-known/openid-configuration'
+    clientId: 'changeme'
+    secret: 'changme'
+    allowUnsignedIdTokens: true
+    #scope: 'openid profile email ala roles'
+    scope: 'openid profile email ala/attrs ala/roles'
+    roleAttribute: ala:role
+    logoutAction: cognito
+    alaUseridClaim: username
+    logoutUrl: https://auth-secure.ala.org.au/logout
+  jwt:
+    enabled: true
+    discoveryUri: 'https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_Auyv55MYO/.well-known/openid-configuration'
+    fallbackToLegacyBehaviour: true
+  core:
+    authCookieName: ALA-Auth-Test
+  cookie:
+    enabled: false
+    domain: .ala.org.au
+
+autocompleteUrl: 'https://bie.ala.org.au/ws/search/auto.jsonp'
+
+auth:
+    admin_role: ROLE_ADMIN
+
+app:
+    http:
+        header:
+            userId: "X-ALA-userId"
+
+headerAndFooter:
+    baseURL: 'https://www.ala.org.au/commonui-bs3-2019'
+    version: '2'
+
+#ala:
+#    baseURL: 'https://www.ala.org.au'
+
+bie:
+    baseURL: 'https://bie.ala.org.au'
+    searchPath: '/search'
+
+bieService:
+    baseURL: 'https://bie.ala.org.au/ws'
+
+favicon:
+  url: 'https://www.ala.org.au/wp-content/themes/ala2011/images/favicon.ico'
+
+skin:
+  header: true
+  footer: true
+  fluidLayout: true
+  layout: 'portal'
+  orgNameLong: 'Atlas of Living Australia'
+  favicon: 'https://www.ala.org.au/app/uploads/2019/01/cropped-favicon-32x32.png'
+
+
+lists:
+    url: 'https://lists.ala.org.au'
+    threatenedSpeciesUrl: '/ws/speciesList/?isThreatened=eq:true&isAuthoritative=eq:true'
+    invasiveSpeciesUrl: '/ws/speciesList/?isInvasive=eq:true&isAuthoritative=eq:true'
+    facets: true
+    migratoryDR: 'dr1005'
+    iconicSpeciesDR: 'dr781'
+
+journalmap:
+    url: 'https://www.journalmap.org'
+
+collections:
+    url: 'https://collections.ala.org.au'
+
+sandbox:
+    url: 'https://sandbox.ala.org.au/ala-hub'
+    uiUrl: 'https://sandbox.ala.org.au'
+
+sandboxService:
+    url: 'https://sandbox.ala.org.au/biocache-service'
+
+gazField: 'cl915'
+
+userObjectsField: 'cl1082'
+
+biocache:
+    url: 'https://biocache-databox.ala.org.au'
+
+biocacheService:
+    url: 'https://biocache-ws-test.ala.org.au/ws'
+    #Facets to ignore in the biocache grouped/facets service
+    default_facets_ignored: 'data_resource_uid,data_provider_uid,species,collection_uid,institution_code_name,institution_uid,uncertainty'
+    custom_facets:
+      Attribution:
+        - Data Provider;data_provider
+        - Collection;collection_name
+        - Data Resource;data_resource
+        - Institution;institution_name
+      Occurrence:
+        - Year;occurrence_year
+
+sampling:
+    url: 'https://sampling.ala.org.au/sampling-service'
+
+geoserver:
+    url: 'https://spatial.ala.org.au/geoserver'
+
+flickr:
+    url: 'https://api.flickr.com/services/rest/?method='
+    searchPhotos: 'flickr.photos.search'
+    # licensesInfo: 'flickr.photos.licenses.getInfo'
+    # licenses data is found at https://api.flickr.com/services/rest/?method=flickr.photos.licenses.getInfo&api_key=<api_key>&format=json&nojsoncallback=1
+    licensesData: {"licenses":{"license":[{"id":"0","name":"All Rights Reserved","url":""},{"id":"4","name":"Attribution License","url":"https://creativecommons.org/licenses/by/2.0/"},{"id":"6","name":"Attribution-NoDerivs License","url":"https://creativecommons.org/licenses/by-nd/2.0/"},{"id":"3","name":"Attribution-NonCommercial-NoDerivs License","url":"https://creativecommons.org/licenses/by-nc-nd/2.0/"},{"id":"2","name":"Attribution-NonCommercial License","url":"https://creativecommons.org/licenses/by-nc/2.0/"},{"id":"1","name":"Attribution-NonCommercial-ShareAlike License","url":"https://creativecommons.org/licenses/by-nc-sa/2.0/"},{"id":"5","name":"Attribution-ShareAlike License","url":"https://creativecommons.org/licenses/by-sa/2.0/"},{"id":"7","name":"No known copyright restrictions","url":"https://www.flickr.com/commons/usage/"},{"id":"8","name":"United States Government Work","url":"http://www.usa.gov/copyright.shtml"},{"id":"9","name":"Public Domain Dedication (CC0)","url":"https://creativecommons.org/publicdomain/zero/1.0/"},{"id":"10","name":"Public Domain Mark","url":"https://creativecommons.org/publicdomain/mark/1.0/"}]},"stat":"ok"}
+    apiKey: ''
+    secret: ''
+    tags: ''
+    extra: 'geo,date_taken,owner_name,license,url_t,url_s,url_m,title'
+    contentType: ''
+    geoContext: ''
+    filter: '&text=landscape'
+    # flickr always returns 250 per page regardless the value of per_page passed in,
+    # so we config total number of photos to display at one time ourselves
+    nbrOfPhotosToDisplay: 15
 
 viewConfig:
-  json: 'view-config.json'
+    json: 'view-config.json'
+
+sessions:
+    dir: '/data/spatial-hub/sessions'
+
+admin_role: 'ROLE_ADMIN'
 
 # List of valid user roles.
 # Use '*' for ANY role (login will be required).
 # Use an empty list for 'login is not required'
-user_roles: []
+user_roles:
+  - '*'
 
+# When using skin.layout='portal' enable google analytics by setting the googleAnalyticsId
+googleAnalyticsId:
+
+# When using skin.layout='portal' enable fathom analytics by setting the fathomId
+fathomId:
+
+
+speciesDotSize: 5
+speciesDotOpacity: 60
+
+logger:
+    baseUrl: 'https://logger.ala.org.au/service'
+
+webservice:
+    readTimeout: 60000
+    connectTimeout: 20000
+    jwt: true
+
+cache:
+    headers:
+        enabled: true
+        control: 'max-age=36000 public must-revalidate'
+
+phylolink:
+    url: 'https://phylolink.ala.org.au'
+
+apiKeyCheckUrlTemplate: 'https://auth.ala.org.au/apikey/ws/check?apikey={0}'
+api_key: 'change me'
+
+character:
+    encoding: UTF-8
+
+http:
+    so:
+      timeout: 10000
+    timeout: 10000
+
+biocollect:
+  loginUrl: 'https://biocollect.ala.org.au'
+  url: 'https://biocollect.ala.org.au'
+  areaReport:
+    - name: 'Citizen science projects'
+      count: "https://biocollect.ala.org.au/acsa/nocas/geoService?max=0&geoSearchJSON=_geoSearchJSON_"
+      link: "https://biocollect.ala.org.au/acsa#geoSearch%3D_geoSearchEncoded_"
+    - name: 'Merit Projects'
+      count: "https://biocollect.ala.org.au/merit/nocas/geoService?max=0&geoSearchJSON=_geoSearchJSON_"
+      link: "https://biocollect.ala.org.au/merit?geoSearchJSON=_geoSearchJSON_"
+
+bccvl:
+    login:
+        url: 'https://app.bccvl.org.au/bccvl/oauth2/authorize?client_id=F031d7ce-abb0-11e6-a678-0242ac120005&response_type=token&redirect_uri='
+    post:
+        url: 'https://app.bccvl.org.au/API/dm/v1/import_ala_data'
+
+keep:
+    alive:
+        timeout:
+            ms: 180000
+
+startup:
+    lat: -25
+    lng: 131
+    zoom: 4
+    baselayer:
+        default: 'osm'
+    baselayers:
+        google_roadmaps:
+            name: 'Streets'
+            layerType: 'ROADMAP'
+            type: 'google'
+            exportType: 'normal'
+            link: 'https://www.google.com/intl/en_au/help/terms_maps.html'
+            projections: ['3857']
+        google_hybrid:
+            name: 'Hybrid'
+            layerType: 'HYBRID'
+            type: 'google'
+            exportType: 'hybrid'
+            link: 'https://www.google.com/intl/en_au/help/terms_maps.html'
+            projections: ['3857']
+        outline:
+            name: 'Outline'
+            type: 'wms'
+            url: 'https://spatial.ala.org.au/geoserver/wms?'
+            layerParams:
+                layers: 'ALA:world'
+                format: 'image/png'
+                continuousWorld: true
+            exportType: 'outline'
+#        osm_projection:
+#            name: 'Open Street Map'
+#            type: 'wms'
+#            url: 'https://spatial.ala.org.au/geoserver/wms?'
+#            layerParams:
+#                # cascade WMS layer in geoserver
+#                layers: 'ALA:osm'
+#                format: 'image/png'
+#                continuousWorld: true
+#            exportType: 'minimal'
+#            link: 'https://www.openstreetmap.org/about'
+#            invalidProjections: ['3857']
+        osm:
+            name: 'OpenStreetMap'
+            url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            type: 'xyz'
+            exportType: 'minimal'
+            link: 'https://www.openstreetmap.org/about'
+            projections: ['3857']
+            layerParams:
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+
+        google_satellite:
+            name: 'Satellite'
+            layerType: 'SATELLITE'
+            type: 'google'
+            exportType: 'satellite'
+            link: 'https://www.google.com/intl/en_au/help/terms_maps.html'
+            projections: ['3857']
+
+defaultareas:
+    - name: 'Australia'
+      fqs: ['longitude:[112 TO 154]', 'latitude:[-44 TO -9]']
+      wkt: 'POLYGON((112.0 -44.0,154.0 -44.0,154.0 -9.0,112.0 -9.0,112.0 -44.0))'
+      areaSqKm: 16322156.76
+      bbox: [112, -44, 154, -9]
+    - name: 'World'
+      fqs: ['*:*']
+      wkt: 'POLYGON((-179.9999 -89.9999,179.9999 -89.9999,179.9999 89.9999,-179.9999 89.9999,-179.9999 -89.9999))'
+      areaSqKm: 510000000
+      bbox: [-180, -90, 180, 90]
+
+presetWMSServers:
+    - name: "AusCover"
+      url: "http://data.auscover.org.au/geoserver/wms?request=getCapabilities"
+    - name: "Geoserver IMOS"
+      url: "http://geoserver.imos.org.au/geoserver/wms?REQUEST=GetCapabilities"
+    - name: "GA"
+      url: "http://services.ga.gov.au/gis/services/GA_Surface_Geology/MapServer/WMSServer?request=GetCapabilities&service=WMS"
+    - name: "Geofabric BOM"
+      url: "http://geofabric.bom.gov.au/simplefeatures/ows?service=WMS&request=GetCapabilities"
+
+allowProxy:
+    server: 'data.auscover.org.au,data.auscover.org.au:80,geoserver.imos.org.au,www.ga.gov.au/gis,geofabric.bom.gov.au,doi.ala.org.au,doi-test.ala.org.au,ga.gov.au,aodn.org.au'
+
+getMapExamples:
+    - name: "Fractional Cover CLW - Non-PS Veg - 2012.297"
+      url: "http://data.auscover.org.au/geoserver/ows?SERVICE=WMS&REQUEST=GetMap&LAYERS=clw:FractCover.V2_2.NPV&FORMAT=image/png&SRS=epsg:3857&TRANSPARENT=true&VERSION=1.3.0&CRS=EPSG:3857&EXCEPTIONS=INIMAGE&STYLES="
+
+wms:
+    intersect: true
+
+fq:
+    excludeAbsent: "-occurrence_status:absent"
 
 # fq applied to every biocache-service query
 qc: ""
+
+# (mandatory) projections.#.definition - usage new L.Proj.CRS(code, proj4js, params)
+# projections.#.definition.code = code
+# projections.#.definition.proj4js = proj4js definition (mandatory when not 3857 or 4326)
+# projections.#.definition.params = parameters (optional)
+#
+# (optional) projections.#.origin  (startup lat, lon, zoom is used when origin is not defined)
+# projections.#.origin.latitude = default latitude
+# projections.#.origin.longitude = default longitude
+# projections.#.origin.zoom = default zoom
+projection:
+    default: '3857'
+projections:
+    "3857":
+      label: 'Pseudo-Mercator -- Spherical Mercator'
+      definition:
+        code: 'EPSG:3857' # leaflet supported, uses startup lat,lon,zoom
+# Uncomment to include these additional projections
+    "4326":
+      label: 'World Geodetic System 1984'
+      definition:
+        code: 'EPSG:4326' # leaflet supported, uses startup lat,lon,zoom
+    "3031":
+      label: 'Antarctic Polar Stereographic'
+      definition:
+        code: 'EPSG:3031'
+        proj4js: '+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
+        params: { resolutions: [ 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1, 0.5 ] }
+      origin:
+        latitude: -80
+        longitude: 0
+        zoom: 1
+    "3575":
+      label: 'North Pole LAEA Europe'
+      definition:
+        code: 'EPSG:3575'
+        proj4js: '+proj=laea +lat_0=90 +lon_0=10 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
+        params:  { resolutions: [ 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1, 0.5 ]}
+      origin:
+        latitude: 60
+        longitude: 0
+        zoom: 1
 
 #
 # spApp configuration
 #
 spApp:
-  # show "map options" and associated controls in the list of layers
-  mapOptions: true
-  # show map control for collapsing up and hiding the header
-  collapseUp: true
-  # show map control for collapsing left and hiding left panel
-  collapseLeft: true
-  # show map control that displays the cursor coordinates (on the lower left of the map, above the scale)
-  cursorCoordinates: true
-  # show map control that displays the quicklinks
-  quicklinks: true
-  # show "map options" button "Add WMS Layer"
-  optionsAddWms: true
-  # show "map options" button "Download Map"
-  optionsDownloadMap: false
-  # show "map options" button "Reset Map"
-  optionsResetMap: true
-  # show "map options" section to change the base map
-  optionsSelectBaseMap: true
-  # load the layerDistances data to display the layer selection list's traffic light indicator
-  layerDistances: true
-  # show the "add to map | area | google location search" option
-  googleLocation: true
-  # show the left panel by default
-  leftPanel: true
-  # show the header by default
-  header: true
-  # list charts to show on species info page
-  charts:
-    genus:
-      title: "By genus"
-      chartType: "doughnut"
-      emptyValueMsg: "Genus not specified"
-      hideEmptyValues: true
-      disableBiocacheQueryOnClick: true
-    collection_uid:
-      title: "By collection"
-      chartType: "doughnut"
-      emptyValueMsg: "Collection not specified"
-      hideEmptyValues: true
-      disableBiocacheQueryOnClick: true
-    assertions:
-      title: "By data assertion"
-      chartType: "horizontal-bar"
-      emptyValueMsg: "Assertion not specified"
-      hideEmptyValues: true
-      disableBiocacheQueryOnClick: true
-    type_status:
-      title: "By type status (as % of all type specimens)"
-      chartType: "doughnut"
-      emptyValueMsg: "Type status not specified"
-      hideEmptyValues: true
-      disableBiocacheQueryOnClick: true
-    state_conservation:
-      title: "By state conservation status"
-      chartType: "bar"
-      emptyValueMsg: "State conservation not specified"
-      hideEmptyValues: true
-      disableBiocacheQueryOnClick: true
-    month:
-      title: "By month"
-      chartType: "bar"
-      emptyValueMsg: "Month not specified"
-      hideEmptyValues: true
-      disableBiocacheQueryOnClick: true
-    decade:
-      title: "By decade"
-      chartType: "bar"
-      emptyValueMsg: "Year not specified"
-      hideEmptyValues: true
-      disableBiocacheQueryOnClick: true
+    # show "map options" and associated controls in the list of layers
+    mapOptions: true
+    # show map control for collapsing up and hiding the header
+    collapseUp: true
+    # show map control for collapsing left and hiding left panel
+    collapseLeft: true
+    # show map control that displays the cursor coordinates (on the lower left of the map, above the scale)
+    cursorCoordinates: true
+    # show map control that displays the quicklinks
+    quicklinks: true
+    # show "map options" button "Add WMS Layer"
+    optionsAddWms: true
+    # show "map options" button "Download Map"
+    optionsDownloadMap: true
+    # show "map options" button "Reset Map"
+    optionsResetMap: true
+    # show "map options" section to change the base map
+    optionsSelectBaseMap: true
+    # load the layerDistances data to display the layer selection list's traffic light indicator
+    layerDistances: true
+    # show the "add to map | area | google location search" option
+    googleLocation: true
+    # show the left panel by default
+    leftPanel: true
+    # show the header by default
+    header: true
+    # list charts to show on species info page
+    charts:
+      genus:
+        title: "By genus"
+        chartType: "doughnut"
+        emptyValueMsg: "Genus not specified"
+        hideEmptyValues: true
+        disableBiocacheQueryOnClick: true
+      collection_uid:
+        title: "By collection"
+        chartType: "doughnut"
+        emptyValueMsg: "Collection not specified"
+        hideEmptyValues: true
+        disableBiocacheQueryOnClick: true
+      assertions:
+        title: "By data assertion"
+        chartType: "horizontal-bar"
+        emptyValueMsg: "Assertion not specified"
+        hideEmptyValues: true
+        disableBiocacheQueryOnClick: true
+      type_status:
+        title: "By type status (as % of all type specimens)"
+        chartType: "doughnut"
+        emptyValueMsg: "Type status not specified"
+        hideEmptyValues: true
+        disableBiocacheQueryOnClick: true
+      state_conservation:
+        title: "By state conservation status"
+        chartType: "bar"
+        emptyValueMsg: "State conservation not specified"
+        hideEmptyValues: true
+        disableBiocacheQueryOnClick: true
+      month:
+        title: "By month"
+        chartType: "bar"
+        emptyValueMsg: "Month not specified"
+        hideEmptyValues: true
+        disableBiocacheQueryOnClick: true
+      decade:
+        title: "By decade"
+        chartType: "bar"
+        emptyValueMsg: "Year not specified"
+        hideEmptyValues: true
+        disableBiocacheQueryOnClick: true
 
 rangeDataTypes:
   - 'tint'
@@ -178,326 +628,38 @@ workflow.enabled: true
 #workflow.speciesFilters: [ { name: 'CSDM default filter', workflowId: 52 } ]
 workflow.speciesFilters: []
 
-google:
-  apikey: "get-a-google-api-key"
+## spring-session config
+spring:
+  session:
+    store-type: "none" # "redis"
+#  redis:
+#    host: "localhost"
+#    port: 6379
+#    password: ""
 
-apiKeyCheckUrlTemplate: "${common.protocol}://${common.domain}/apikey/ws/check?apikey={0}"
-api_key: "dummy"
-autocompleteUrl: "${common.protocol}://${common.domain}/bie-index/search/auto.jsonp"
+# Used by the DOI dataset import and DOI generation when exporting datasets
+#doiService:
+#  url: "https://doi.ala.org.au"
+#  searchFilter:
+#    applicationMetadata:
+#      applicationName: "CSDM"
+#  hubName: "CSDM"
+#  reasonTypeId: 13
+#  sourceTypeId: 10002
 
-auth:
-  admin_role: ROLE_ADMIN
-
-#app:
-#  http:
-#    header:
-#      userId: X-ALA-userId
-
-ala:
-  baseURL: "${common.protocol}://${common.domain}"
-bie:
-  baseURL: "${common.protocol}://${common.domain}/bie-hub"
-  searchPath: '/search'
-
-bieService:
-  baseURL: "${common.protocol}://${common.domain}/bie-index"
-
-userdetails:
-  web:
-    url: "${common.protocol}://${common.domain}/userdetails/"
-  api:
-    url: "${common.protocol}://${common.domain}/userdetails/"
-
-layersService:
-  url: "${common.protocol}://${common.domain}/spatial-service"
-
-lists:
-  url: ''
-  #  TODO: causes the portal-full tomcat to hang at startup, spatial-hub blocks on this
-  #        and species-lists is no yet serving any requests
-  #  url: "${common.protocol}://${common.domain}/species-list"
-  threatenedSpeciesUrl: '/ws/speciesList/?isThreatened=eq:true&isAuthoritative=eq:true'
-  invasiveSpeciesUrl: '/ws/speciesList/?isInvasive=eq:true&isAuthoritative=eq:true'
-  facets: True
-  migratoryDR: dr1005
-  iconicSpeciesDR: dr781
-
-journalmap:
-  url: "https://www.journalmap.org/"
-
-collections:
-  url: "${common.protocol}://${common.domain}/collectory"
-
-sandbox:
-  url: "${common.protocol}://${common.domain}/spatial-hub/sandbox"
-  uiUrl: "${common.protocol}://${common.domain}/spatial-hub/datacheck" # This is wrong, not sure where to point it to
-
-sandboxService:
-  url: "${common.protocol}://sandbox.${common.domain}/biocache-service"
-
-gazField: cl2123
-
-userObjectsField: cl1083
-
-biocache:
-  url: "${common.protocol}://${common.domain}/biocache-hub"
-
-biocacheService:
-  url: "${common.protocol}://${common.domain}/biocache-service"
-  #Facets to ignore in the biocache grouped/facets service
-  default_facets_ignored: "data_resource_uid,data_provider_uid,species,collection_uid,institution_code_name,institution_uid,uncertainty"
-  custom_facets:
-    Attribution: [ 'Data Provider;data_provider', 'Collection;collection_name', 'Data Resource;data_resource', 'Institution;institution_name' ]
-    Location: [ 'Coordinate Uncertainty;coordinate_uncertainty' ]
-    Occurrence: [ 'Year;occurrence_year' ]
-
-sampling:
-  url: "${common.protocol}://${common.domain}/spatial-service"
-
-geoserver:
-  url: "${common.protocol}://${common.domain}/geoserver"
-
-flickr:
-  url: "https://api.flickr.com/services/rest/?method="
-  searchPhotos: 'flickr.photos.search'
-  # licensesInfo: 'flickr.photos.licenses.getInfo'
-  # licenses data is found at https://api.flickr.com/services/rest/?method=flickr.photos.licenses.getInfo&api_key=<api_key>&format=json&nojsoncallback=1
-  licensesData: { 'licenses': { 'license': [ { 'id': '0', 'name': 'All Rights Reserved', 'url': '' }, { 'id': '4', 'name': 'Attribution License', 'url': 'https://creativecommons.org/licenses/by/2.0/' }, { 'id': '6', 'name': 'Attribution-NoDerivs License', 'url': 'https://creativecommons.org/licenses/by-nd/2.0/' }, { 'id': '3', 'name': 'Attribution-NonCommercial-NoDerivs License', 'url': 'https://creativecommons.org/licenses/by-nc-nd/2.0/' }, { 'id': '2', 'name': 'Attribution-NonCommercial License', 'url': 'https://creativecommons.org/licenses/by-nc/2.0/' }, { 'id': '1', 'name': 'Attribution-NonCommercial-ShareAlike License', 'url': 'https://creativecommons.org/licenses/by-nc-sa/2.0/' }, { 'id': '5', 'name': 'Attribution-ShareAlike License', 'url': 'https://creativecommons.org/licenses/by-sa/2.0/' }, { 'id': '7', 'name': 'No known copyright restrictions', 'url': 'https://www.flickr.com/commons/usage/' }, { 'id': '8', 'name': 'United States Government Work', 'url': 'http://www.usa.gov/copyright.shtml' }, { 'id': '9', 'name': 'Public Domain Dedication (CC0)', 'url': 'https://creativecommons.org/publicdomain/zero/1.0/' }, { 'id': '10', 'name': 'Public Domain Mark', 'url': 'https://creativecommons.org/publicdomain/mark/1.0/' } ] }, 'stat': 'ok' }
-  apiKey:
-  secret:
-  tags:
-  extra: "geo,date_taken,owner_name,license,url_t,url_s,url_m,title"
-  contentType:
-  geoContext:
-  filter: "&text=landscape"
-  nbrOfPhotosToDisplay: 15
-
-#viewConfig:
-#    json: 'view-config.json'
-
-sessions:
-  dir: '/data/spatial-hub/sessions'
-
-admin_role: ROLE_ADMIN
-
-skin:
-  orgNameLong: "Vlaams Biodiversiteitsportaal"
-  orgNameShort: "VBP"
-  header: true
-  footer: true
-  fluidLayout: true
-  layout: vlaanderen
-#  layout: 'main'
-
-grails.controllers.upload.maxFileSize: 614400000
-grails.controllers.upload.maxRequestSize: 614400000
-
-speciesDotSize: 5
-speciesDotOpacity: 60
-
-logger:
-  baseUrl: "${common.protocol}://${common.domain}/logger/service"
-
-#TBC : decommisioned
-phylolink:
-  url: "https://phylolink.ala.org.au"
-
-biocollect:
-  url: ""
-
-bccvl:
-  login:
-    url: "https://app.bccvl.org.au/bccvl/oauth2/authorize?client_id=F031d7ce-abb0-11e6-a678-0242ac120005&response_type=token&redirect_uri="
-  post:
-    url: "https://app.bccvl.org.au/API/dm/v1/import_ala_data"
-keep:
-  alive:
-    timeout:
-      ms: 10000
-
-startup:
-  lat: 51.0
-  lng: 4.4
-  zoom: 9
-  baselayer:
-    default: grb
-  baselayers:
-    #    google_roadmaps:
-    #      name: 'Streets'
-    #      layerType: 'ROADMAP'
-    #      type: 'google'
-    #      exportType: 'normal'
-    #      link: 'https://www.google.com/intl/en_au/help/terms_maps.html'
-    #      projections: ['3857']
-    #    google_hybrid:
-    #      name: 'Hybrid'
-    #      layerType: 'HYBRID'
-    #      type: 'google'
-    #      exportType: 'hybrid'
-    #      link: 'https://www.google.com/intl/en_au/help/terms_maps.html'
-    #      projections: ['3857']
-    grb:
-      name: 'Grootschalig Referentiebestand'
-      type: 'wms'
-      url: "https://geo.api.vlaanderen.be/GRB/wms?"
-      layerParams:
-        layers: GRB_BSK
-        format: 'image/png'
-      link: "https://www.vlaanderen.be/datavindplaats/catalogus/wms-grb"
-      exportType: 'normal'
-    grb_wfs:
-      name: 'Grootschalig Referentiebestand WFS'
-      type: 'wfs'
-      url: "https://geo.api.vlaanderen.be/GRB/wfs?"
-      layer: grb_bsk
-      link: "https://www.vlaanderen.be/datavindplaats/catalogus/wfs-grb"
-      exportType: 'normal'
-    grb_wmts:
-      name: 'Grootschalig Referentiebestand WMTS'
-      type: 'wmts'
-      url: "https://geo.api.vlaanderen.be/GRB/wmts?"
-      layer: grb_bsk
-      link: "https://www.vlaanderen.be/datavindplaats/catalogus/wmts-grb"
-      exportType: 'normal'
-    grouped:
-      name: 'Grootschalig Referentiebestand Grouped'
-      type: 'group'
-      layers:
-        #        - name: 'Grootschalig Referentiebestand WMTS'
-        #          type: 'wmts'
-        #          url: "https://geo.api.vlaanderen.be/GRB/wmts?"
-        #          layer: grb_bsk
-        #          link: "https://www.vlaanderen.be/datavindplaats/catalogus/wmts-grb"
-        #          exportType: 'normal'
-        - name: 'Open Street Map'
-          url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          type: 'xyz'
-          exportType: 'minimal'
-          link: 'https://www.openstreetmap.org/about'
-          projections: ['3857']
-#    grb_grijs:
-#      name: 'Grootschalig Referentiebestand (Grijs)'
-#      type: 'wms'
-#      url: "https://geo.api.vlaanderen.be/GRB/wms?"
-#      layerParams:
-#        layers: GRB_BSK_GRIJS
-#        format: 'image/png'
-#      link: "https://www.vlaanderen.be/datavindplaats/catalogus/wms-grb"
-#      exportType: 'normal'
-#    luchtkaart:
-#      name: 'Luchtfoto'
-#      type: 'wms'
-#      url: "https://geo.api.vlaanderen.be/OMWRGBMRVL/wms?"
-#      layerParams:
-#        layers: OMWRGBMRVL
-#        format: 'image/png'
-#      link: "https://www.vlaanderen.be/datavindplaats/catalogus/wms-grb"
-#      exportType: 'satellite'
-#    osm:
-#      name: 'Open Street Map'
-#      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-#      type: 'xyz'
-#      exportType: 'minimal'
-#      link: 'https://www.openstreetmap.org/about'
-#      projections: ['3857']
-#    google_satellite:
-#      name: 'Satellite'
-#      layerType: 'SATELLITE'
-#      type: 'google'
-#      exportType: 'satellite'
-#      link: 'https://www.google.com/intl/en_au/help/terms_maps.html'
-#      projections: ['3857']
-
-defaultareas:
-  - name: 'Vlaanderen'
-    fqs: [ 'longitude:[2.296 TO 6.1468505859375]', 'latitude:[50.6 TO 51.5]' ]
-    wkt: 'POLYGON((2.296 50.6, 6.1468505859375 50.6, 6.1468505859375 51.5, 2.296 51.5, 2.296 50.6))'
-    areaSqKm: 13625
-    bbox: [ 50.65843926853822, 51.52780962525605, 2.296, 6.1468505859375 ]
-
-presetWMSServers:
-  - name: "GRB"
-    url: "https://geo.api.vlaanderen.be/GRB/wms?service=WMS&request=getcapabilities"
-  - name: "INBO"
-    url: "https://geo.api.vlaanderen.be/INBO/wms?service=WMS&request=getcapabilities"
-  - name: "INBO - ARPL"
-    url: "https://gisservices.inbo.be/arcgis/services/ARPL/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - BWK"
-    url: "https://gisservices.inbo.be/arcgis/services/BWK/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Ecoregio"
-    url: "https://gisservices.inbo.be/arcgis/services/Ecoregio/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Ecotoopkwetsbaarheid"
-    url: "https://gisservices.inbo.be/arcgis/services/Ecotoopkwetsbaarheid/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Genenbronnen"
-    url: "https://gisservices.inbo.be/arcgis/services/Genenbronnen/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Grenzen"
-    url: "https://gisservices.inbo.be/arcgis/services/Grenzen/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Habitatkaart"
-    url: "https://gisservices.inbo.be/arcgis/services/Habitatkaart/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - IFBLhokken"
-    url: "https://gisservices.inbo.be/arcgis/services/IFBLhokken/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - IFBL"
-    url: "https://gisservices.inbo.be/arcgis/services/IFBL/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - ImportantPollinatorAreas"
-    url: "https://gisservices.inbo.be/arcgis/services/ImportantPollinatorAreas/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - LSVIviewer"
-    url: "https://gisservices.inbo.be/arcgis/services/LSVIviewer/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Natura2000"
-    url: "https://gisservices.inbo.be/arcgis/services/Natura2000/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Orthofoto_WM"
-    url: "https://gisservices.inbo.be/arcgis/services/Orthofoto_WM/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Orthofoto"
-    url: "https://gisservices.inbo.be/arcgis/services/Orthofoto/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Potleefgebieden"
-    url: "https://gisservices.inbo.be/arcgis/services/Potleefgebieden/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - PotNat"
-    url: "https://gisservices.inbo.be/arcgis/services/PotNat/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Signaalkaart_vleermuizen"
-    url: "https://gisservices.inbo.be/arcgis/services/Signaalkaart_vleermuizen/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Signaalkaart"
-    url: "https://gisservices.inbo.be/arcgis/services/Signaalkaart/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - UTMhokken"
-    url: "https://gisservices.inbo.be/arcgis/services/UTMhokken/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - VEN"
-    url: "https://gisservices.inbo.be/arcgis/services/VEN/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - VIS_VHA_WV"
-    url: "https://gisservices.inbo.be/arcgis/services/VIS_VHA_WV/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - VRB"
-    url: "https://gisservices.inbo.be/arcgis/services/VRB/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-  - name: "INBO - Watervlakken"
-    url: "https://gisservices.inbo.be/arcgis/services/Watervlakken/MapServer/WMSServer?request=GetCapabilities&service=WMS"
-
-
-allowProxy:
-  server: "geo.api.vlaanderen.be,gisservices.inbo.be"
-
-#getMapExamples:
-#  - name: "Fractional Cover CLW - Non-PS Veg - 2012.297"
-#    url: "http://data.auscover.org.au/geoserver/ows?SERVICE=WMS&REQUEST=GetMap&LAYERS=clw:FractCover.V2_2.NPV&FORMAT=image/png&SRS=epsg:3857&TRANSPARENT=true&VERSION=1.3.0&CRS=EPSG:3857&EXCEPTIONS=INIMAGE&STYLES="
-
-wms:
-  intersect: True
-
-fq:
-  excludeAbsent: "-occurrence_status_s:absent"
-
-# (mandatory) projections.#.definition - usage new L.Proj.CRS(code, proj4js, params)
-# projections.#.definition.code = code
-# projections.#.definition.proj4js = proj4js definition (mandatory when not 3857 or 4326)
-# projections.#.definition.params = parameters (optional)
-#
-# (optional) projections.#.origin  (startup lat, lon, zoom is used when origin is not defined)
-# projections.#.origin.latitude = default latitude
-# projections.#.origin.longitude = default longitude
-# projections.#.origin.zoom = default zoom
-#projection:
-#  default: 31370
-#projections:
-#    3857:
-#      label: 'Pseudo-Mercator -- Spherical Mercator'
-#      definition:
-#        code: 'EPSG:3857' # leaflet supported, uses startup lat,lon,zoom
-#    31370:
-#      label: 'Belgische Lambert 1972'
-#      definition:
-#        code: 'EPSG:31370'
+---
+environments:
+    development:
+        server:
+          port: 8087
+          use-forward-headers: true
+        grails:
+          serverURL: "http://localhost:8087"
+        layersService:
+          url: "http://localhost:8081/ws"
+        geoserver:
+          url: 'http://localhost:8079/geoserver'
+    test:
+    production:
+        assets:
+          bundle: true
