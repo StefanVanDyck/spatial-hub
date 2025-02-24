@@ -17,7 +17,7 @@
 //= require L.Google/L.Google.js
 //= require leaflet-control-window/L.Control.Window.js
 //= require leaflet-fullscreen/Control.FullScreen.js
-//= require leaflet.tilelayer.wmts/leaflet-tilelayer-wmts.js
+//= require leaflet.tilelayer.wmts/leaflet-tilelayer-wmts-src.js
 //= require wellknown/wellknown.js
 //= require leaflet-label/leaflet.label.js
 //= require leaflet-geodesy/leaflet-geodesy.js

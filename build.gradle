@@ -15,18 +15,18 @@ buildscript {
 version "2.1.2-SNAPSHOT"
 group "au.org.ala"
 
-apply plugin:"eclipse"
-apply plugin:"idea"
-apply plugin:"war"
-apply plugin:"org.grails.grails-web"
-apply plugin:"com.github.erdi.webdriver-binaries"
-apply plugin:"org.grails.grails-gsp"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "war"
+apply plugin: "org.grails.grails-web"
+apply plugin: "com.github.erdi.webdriver-binaries"
+apply plugin: "org.grails.grails-gsp"
 //Angular assert wrapper needs
-apply plugin:"com.bertramlabs.asset-pipeline"
-apply plugin:"maven-publish"
+apply plugin: "com.bertramlabs.asset-pipeline"
+apply plugin: "maven-publish"
 
 war {
-    enabled=true
+    enabled = true
 }
 
 buildProperties {
@@ -50,7 +50,7 @@ configurations {
 
 dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-   // compile "org.springframework.boot:spring-boot-starter-logging"
+    // compile "org.springframework.boot:spring-boot-starter-logging"
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation "org.grails:grails-core"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
@@ -121,7 +121,7 @@ if (inplace) {
     grails {
         exploded = true
         plugins {
-            implementation (project(':ala-charts-plugin')) {
+            implementation(project(':ala-charts-plugin')) {
                 exclude group: 'org.grails', module: 'grails-plugin-converters'
             }
         }
@@ -141,10 +141,10 @@ bootRun.dependsOn(_Events)
 
 bootRun {
     jvmArgs(
-        '-Dspring.output.ansi.enabled=always',
-        '-noverify',
-        '-XX:TieredStopAtLevel=1',
-        '-Xmx1024m')
+            '-Dspring.output.ansi.enabled=always',
+            '-noverify',
+            '-XX:TieredStopAtLevel=1',
+            '-Xmx1024m')
     sourceResources sourceSets.main
     String springProfilesActive = 'spring.profiles.active'
     systemProperty springProfilesActive, System.getProperty(springProfilesActive)
@@ -165,13 +165,13 @@ ext {
 webdriverBinaries {
     driverUrlsConfiguration = resources.text.fromFile('geb-repo-arm64.json') // (2)
 
-        chromedriver {
-            version = '101.0.4951.41'
-            architecture = 'ARM64'
-        }
-        geckodriver {
-            version = '0.31.0'
-        }
+    chromedriver {
+        version = '101.0.4951.41'
+        architecture = 'ARM64'
+    }
+    geckodriver {
+        version = '0.31.0'
+    }
 
 }
 
@@ -184,16 +184,15 @@ tasks.getByName("integrationTest") {
 
     group JavaBasePlugin.VERIFICATION_GROUP
     systemProperty "geb.build.reportsDir", reporting.file("geb/$name")
-    systemProperty "geb.env",  System.properties['driver']?:"firefox"  // firefox by default
+    systemProperty "geb.env", System.properties['driver'] ?: "firefox"  // firefox by default
     // pass test server by -DbaseUrl
     systemProperty "geb.build.baseUrl", System.properties['baseUrl'] ?: "http://devt.ala.org.au:8087"
     //Store username and password into the default config file
-    systemProperty "configFile",System.properties['configFile']?: "/data/spatial-hub/test/default.properties"
+    systemProperty "configFile", System.properties['configFile'] ?: "/data/spatial-hub/test/default.properties"
     //or pass with -Dusername, -Dpassword
     systemProperty "username", System.properties['username']
     systemProperty "password", System.properties['password']
 }
-
 
 
 tasks.withType(Test) {
@@ -208,7 +207,11 @@ tasks.withType(Test) {
 
 assets {
     minifyJs = false
-    minifyCss = true
+    minifyCss = false
+    minifyOptions = [
+        includes: [],
+        excludes: ["**/*"]
+    ]
 }
 
 // Refer to FieldCapture: https://github.com/AtlasOfLivingAustralia/fieldcapture/blob/feature/grails4/gradle/publish.gradle
