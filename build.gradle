@@ -212,6 +212,9 @@ assets {
         includes: [],
         excludes: ["**/*"]
     ]
+    enableSourceMaps = true
+    enableDigests = false
+
 }
 
 // Refer to FieldCapture: https://github.com/AtlasOfLivingAustralia/fieldcapture/blob/feature/grails4/gradle/publish.gradle
